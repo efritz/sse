@@ -61,21 +61,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 // Start will begin serializing events that come in on the
 // event channel and sending the payload to each registered
-// client. This routine stops once the server's event channel
-// is closed.
-func (s *Server) Start() {
-	go func() {
-		for event := range s.events {
-			data, err := serializeSSE(event)
-			if err != nil {
-				return // TODO
-			}
+// client. This method will block until the event channel
+// has closed.
+func (s *Server) Start() error {
+	defer s.deregisterAll()
 
-			s.publish(data)
+	for event := range s.events {
+		data, err := serializeSSE(event)
+		if err != nil {
+			return err
 		}
 
-		s.deregisterAll()
-	}()
+		s.publish(data)
+	}
+
+	return nil
 }
 
 func (s *Server) register(r *http.Request) <-chan []byte {
@@ -117,5 +117,4 @@ func (s *Server) publish(data []byte) {
 		default:
 		}
 	}
-
 }
