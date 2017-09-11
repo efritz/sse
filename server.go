@@ -5,24 +5,38 @@ import (
 	"sync"
 )
 
-// Server is an http.Handler that will fanout Server-Sent Events
-// to all connected clients.
-type Server struct {
-	events     <-chan interface{}
-	requests   map[*http.Request]chan []byte
-	mutex      *sync.RWMutex
-	bufferSize int
-}
+type (
+	// Server is an http.Handler that will fanout Server-Sent Events
+	// to all connected clients.
+	Server struct {
+		events     <-chan interface{}
+		requests   map[*http.Request]chan []byte
+		mutex      *sync.RWMutex
+		bufferSize int
+	}
+
+	ConfigFunc func(*Server)
+)
 
 // NewServer creates a new server with the given event channel.
 // The server returned by this function has not yet started.
-func NewServer(events <-chan interface{}) *Server {
-	return &Server{
+func NewServer(events <-chan interface{}, configs ...ConfigFunc) *Server {
+	s := &Server{
 		events:     events,
 		requests:   map[*http.Request]chan []byte{},
 		mutex:      &sync.RWMutex{},
 		bufferSize: 100,
 	}
+
+	for _, f := range configs {
+		f(s)
+	}
+
+	return s
+}
+
+func WithBufferSize(bufferSize int) ConfigFunc {
+	return func(s *Server) { s.bufferSize = bufferSize }
 }
 
 // ServeHTTP will begin sending events to a new client. This handler
@@ -49,7 +63,11 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		case <-notify:
 			return
 
-		case data := <-ch:
+		case data, ok := <-ch:
+			if !ok {
+				return
+			}
+
 			if _, err := w.Write(data); err != nil {
 				return
 			}
