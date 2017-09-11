@@ -1,4 +1,4 @@
-# Nacelle
+# SSE Announce Server
 
 [![GoDoc](https://godoc.org/github.com/efritz/sse?status.svg)](https://godoc.org/github.com/efritz/sse)
 [![Build Status](https://secure.travis-ci.org/efritz/sse.png)](http://travis-ci.org/efritz/sse)
