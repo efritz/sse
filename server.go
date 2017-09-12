@@ -1,6 +1,8 @@
 package sse
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"sync"
 )
@@ -15,6 +17,7 @@ type (
 		bufferSize int
 	}
 
+	// ConfigFunc is a function used to initialize a new server.
 	ConfigFunc func(*Server)
 )
 
@@ -35,6 +38,8 @@ func NewServer(events <-chan interface{}, configs ...ConfigFunc) *Server {
 	return s
 }
 
+// WithBufferSize sets the internal buffer for each connected client.
+// This buffer counts distinct events. The default is 100.
 func WithBufferSize(bufferSize int) ConfigFunc {
 	return func(s *Server) { s.bufferSize = bufferSize }
 }
@@ -96,6 +101,9 @@ func (s *Server) Start() error {
 	return nil
 }
 
+//
+// Helpers
+
 func (s *Server) register(r *http.Request) <-chan []byte {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
@@ -135,4 +143,26 @@ func (s *Server) publish(data []byte) {
 		default:
 		}
 	}
+}
+
+func serializeSSE(event interface{}) ([]byte, error) {
+	buffer := bytes.Buffer{}
+	if _, err := buffer.Write([]byte("data:")); err != nil {
+		return nil, err
+	}
+
+	payload, err := json.Marshal(event)
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := buffer.Write(payload); err != nil {
+		return nil, err
+	}
+
+	if _, err := buffer.Write([]byte("\n\n")); err != nil {
+		return nil, err
+	}
+
+	return buffer.Bytes(), nil
 }
