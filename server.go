@@ -13,7 +13,7 @@ type (
 	Server struct {
 		events     <-chan interface{}
 		requests   map[*http.Request]chan []byte
-		mutex      *sync.RWMutex
+		mutex      sync.RWMutex
 		bufferSize int
 	}
 
@@ -27,7 +27,6 @@ func NewServer(events <-chan interface{}, configs ...ConfigFunc) *Server {
 	s := &Server{
 		events:     events,
 		requests:   map[*http.Request]chan []byte{},
-		mutex:      &sync.RWMutex{},
 		bufferSize: 100,
 	}
 
