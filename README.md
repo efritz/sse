@@ -2,7 +2,8 @@
 
 [![GoDoc](https://godoc.org/github.com/efritz/sse?status.svg)](https://godoc.org/github.com/efritz/sse)
 [![Build Status](https://secure.travis-ci.org/efritz/sse.png)](http://travis-ci.org/efritz/sse)
-[![codecov.io](http://codecov.io/github/efritz/sse/coverage.svg?branch=master)](http://codecov.io/github/efritz/sse?branch=master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/dbc9e2172b25adc864be/maintainability)](https://codeclimate.com/github/efritz/sse/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/dbc9e2172b25adc864be/test_coverage)](https://codeclimate.com/github/efritz/sse/test_coverage)
 
 Go server for announcing a stream of [Server-Sent Events](https://en.wikipedia.org/wiki/Server-sent_events).
 
