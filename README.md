@@ -24,7 +24,7 @@ go func() {
     if err := server.Start(); err != nil {
         panic(err.Error())
     }
-}
+}()
 
 go func() {
     defer close(events)
@@ -32,7 +32,7 @@ go func() {
     events <- map[string]int{"foo": 1}
     events <- map[string]int{"bar": 2}
     events <- map[string]int{"baz": 3}
-}
+}()
 
 http.Handle("/events", server)
 http.ListenAndServe("0.0.0.0:8080", nil)
