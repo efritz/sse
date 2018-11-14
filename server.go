@@ -3,6 +3,7 @@ package sse
 import (
 	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 	"sync"
 )
@@ -72,7 +73,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if _, err := w.Write(data); err != nil {
+			if err := writeAll(w, data); err != nil {
 				return
 			}
 
@@ -164,4 +165,17 @@ func serializeSSE(event interface{}) ([]byte, error) {
 	}
 
 	return buffer.Bytes(), nil
+}
+
+func writeAll(w io.Writer, data []byte) error {
+	for len(data) > 0 {
+		n, err := w.Write(data)
+		if err != nil {
+			return err
+		}
+
+		data = data[n:]
+	}
+
+	return nil
 }
