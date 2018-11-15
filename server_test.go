@@ -5,22 +5,11 @@ import (
 	"math"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 	"time"
 
 	"github.com/aphistic/sweet"
-	"github.com/aphistic/sweet-junit"
 	. "github.com/onsi/gomega"
 )
-
-func TestMain(m *testing.M) {
-	RegisterFailHandler(sweet.GomegaFail)
-
-	sweet.Run(m, func(s *sweet.S) {
-		s.RegisterPlugin(junit.NewPlugin())
-		s.AddSuite(&ServerSuite{})
-	})
-}
 
 type ServerSuite struct{}
 
@@ -193,27 +182,6 @@ func (s *ServerSuite) TestClientDisconnect(t sweet.T) {
 	Expect(string(body)).To(ContainSubstring(`data:{"foo":1}`))
 	Expect(string(body)).To(ContainSubstring(`data:{"bar":2}`))
 	Expect(string(body)).To(ContainSubstring(`data:{"baz":3}`))
-}
-
-func (s *ServerSuite) TestSerializeSSE(t sweet.T) {
-	data, err := serializeSSE(map[string]interface{}{
-		"foo": 3.141,
-		"bar": "baz",
-	})
-
-	Expect(err).To(BeNil())
-	Expect(string(data)).To(HavePrefix("data:"))
-	Expect(string(data)).To(HaveSuffix("\n\n"))
-
-	Expect(string(data[5:])).To(MatchJSON(`{
-		"foo": 3.141,
-		"bar": "baz"
-	}`))
-}
-
-func (s *ServerSuite) TestSerializeSSEMarshalError(t sweet.T) {
-	_, err := serializeSSE(math.Inf(1))
-	Expect(err).NotTo(BeNil())
 }
 
 //

@@ -9,7 +9,7 @@ Go server for announcing a stream of [Server-Sent Events](https://en.wikipedia.o
 
 ## Example
 
-An SSE announce server implements `http.Handler` so it can be registered to
+An SSE announce server creates an `http.Handler` that can be registered to
 an existing router in your application. It takes a read-only channel of
 interface objects to send to all connected clients. Once a client connects
 they will begin receiving all events that occur *at that point* until they
@@ -34,7 +34,7 @@ go func() {
     events <- map[string]int{"baz": 3}
 }()
 
-http.Handle("/events", server)
+http.Handle("/events", server.ServeHTTP)
 http.ListenAndServe("0.0.0.0:8080", nil)
 ```
 
