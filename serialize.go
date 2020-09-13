@@ -12,13 +12,13 @@ func serializeEvent(event interface{}) ([]byte, error) {
 	buffer := bytes.Buffer{}
 
 	c++
-	if _, err := buffer.Write([]byte(fmt.Sprintf("id:%d\n", c))); err != nil {
+	if _, err := buffer.Write([]byte(fmt.Sprintf("id: %d\n", c))); err != nil {
 		return nil, err
 	}
-	if _, err := buffer.Write([]byte("event:temp\n")); err != nil {
+	if _, err := buffer.Write([]byte("event: temp\n")); err != nil {
 		return nil, err
 	}
-	if _, err := buffer.Write([]byte("data:")); err != nil {
+	if _, err := buffer.Write([]byte("data: ")); err != nil {
 		return nil, err
 	}
 
